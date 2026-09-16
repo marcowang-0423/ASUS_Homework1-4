@@ -7,10 +7,19 @@
 
 #define MAX_LOADSTRING 100
 
+#define IDC_EDIT_RED    1001
+#define IDC_EDIT_GREEN  1002
+#define IDC_EDIT_BLUE   1003
+#define IDC_BUTTON_APPLY 1004
+
+  
+
 // 全域變數:
 HINSTANCE hInst;                                // 目前執行個體
 WCHAR szTitle[MAX_LOADSTRING];                  // 標題列文字
 WCHAR szWindowClass[MAX_LOADSTRING];            // 主視窗類別名稱
+
+HWND hEditRed, hEditGreen, hEditBlue;           // 存輸入框的 handle
 
 // 這個程式碼模組所包含之函式的向前宣告:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -188,25 +197,95 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
         {
-            HWND hButton = CreateWindowW(
-                L"BUTTON",              // 控制項類型
-                L"BUTTON",            // Button 上顯示的文字
-                WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,
-                100, 100,               // x, y
-                120, 40,                // width, height
-                hWnd,                   // parent window
-                (HMENU)1,               // Button ID
-                hInst,
-                nullptr
+            //HWND hButton = CreateWindowW(
+            //    L"BUTTON",              // 控制項類型
+            //    L"BUTTON",            // Button 上顯示的文字
+            //    WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,
+            //    100, 100,               // x, y
+            //    120, 40,                // width, height
+            //    hWnd,                   // parent window
+            //    (HMENU)1,               // Button ID
+            //    hInst,
+            //    nullptr
+            //);
+
+            //// HW1 Debug message 
+            //HWND hFail = CreateWindowW(NULL, NULL, NULL, NULL, NULL,
+            //    NULL, NULL, NULL, NULL, NULL, NULL);
+            //if (hFail == NULL)
+            //{
+            //    LogLastError(L"CreateWindowW");
+            //}
+
+
+
+            // "Simple >>" 標籤（先做成單純的靜態文字，不做展開/收合功能）
+            CreateWindowW(
+                L"STATIC", L"Simple >>",
+                WS_VISIBLE | WS_CHILD,
+                20, 20, 80, 20,
+                hWnd, nullptr, hInst, nullptr
             );
 
-            // HW1 Debug message 
-            HWND hFail = CreateWindowW(NULL, NULL, NULL, NULL, NULL,
-                NULL, NULL, NULL, NULL, NULL, NULL);
-            if (hFail == NULL)
-            {
-                LogLastError(L"CreateWindowW");
-            }
+            // ---- Red ----
+            CreateWindowW(
+                L"STATIC", L"Red",
+                WS_VISIBLE | WS_CHILD,
+                20, 60, 40, 20,
+                hWnd, nullptr, hInst, nullptr
+            );
+            hEditRed = CreateWindowW(
+                L"EDIT", L"0x00",
+                WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
+                70, 58, 60, 22,
+                hWnd, (HMENU)IDC_EDIT_RED, hInst, nullptr
+            );
+
+            // ---- Green ----
+            CreateWindowW(
+                L"STATIC", L"Green",
+                WS_VISIBLE | WS_CHILD,
+                160, 60, 40, 20,
+                hWnd, nullptr, hInst, nullptr
+            );
+            hEditGreen = CreateWindowW(
+                L"EDIT", L"0x00",
+                WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
+                210, 58, 60, 22,
+                hWnd, (HMENU)IDC_EDIT_GREEN, hInst, nullptr
+            );
+
+            // ---- Blue ----
+            CreateWindowW(
+                L"STATIC", L"Blue",
+                WS_VISIBLE | WS_CHILD,
+                300, 60, 40, 20,
+                hWnd, nullptr, hInst, nullptr
+            );
+            hEditBlue = CreateWindowW(
+                L"EDIT", L"0x00",
+                WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
+                350, 58, 60, 22,
+                hWnd, (HMENU)IDC_EDIT_BLUE, hInst, nullptr
+            );
+
+            // ---- Apply 按鈕 ----
+            CreateWindowW(
+                L"BUTTON", L"Apply",
+                WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+                20, 100, 80, 30,
+                hWnd, (HMENU)IDC_BUTTON_APPLY, hInst, nullptr
+            );
+
+            // 讀取 ini 檔，把上次存的值填回輸入框；如果 ini 檔不存在或沒有這個 key，就用預設值 "0x00"
+            wchar_t savedRed[16], savedGreen[16], savedBlue[16];
+            GetPrivateProfileStringW(L"Color", L"Red", L"0x00", savedRed, 16, L"C:\\ProgramData\\Homework.ini");
+            GetPrivateProfileStringW(L"Color", L"Green", L"0x00", savedGreen, 16, L"C:\\ProgramData\\Homework.ini");
+            GetPrivateProfileStringW(L"Color", L"Blue", L"0x00", savedBlue, 16, L"C:\\ProgramData\\Homework.ini");
+
+            SetWindowTextW(hEditRed, savedRed);
+            SetWindowTextW(hEditGreen, savedGreen);
+            SetWindowTextW(hEditBlue, savedBlue);
 
             
         }
@@ -217,6 +296,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 剖析功能表選取項目:
             switch (wmId)
             {
+            case IDC_BUTTON_APPLY:
+                {
+                    wchar_t redText[16], greenText[16], blueText[16];
+                    GetWindowTextW(hEditRed, redText, 16);
+                    GetWindowTextW(hEditGreen, greenText, 16);
+                    GetWindowTextW(hEditBlue, blueText, 16);
+
+                    wchar_t debugMsg[128];
+                    StringCchPrintfW(debugMsg, 128, L"Apply clicked: R=%s, G=%s, B=%s\n",
+                    redText, greenText, blueText);
+                    OutputDebugStringW(debugMsg);
+
+                    // 寫進 ini 檔，[Color] 區塊底下的 Red / Green / Blue
+                    WritePrivateProfileStringW(L"Color", L"Red", redText, L"C:\\ProgramData\\Homework.ini");
+                    WritePrivateProfileStringW(L"Color", L"Green", greenText, L"C:\\ProgramData\\Homework.ini");
+                    WritePrivateProfileStringW(L"Color", L"Blue", blueText, L"C:\\ProgramData\\Homework.ini");
+
+                    OutputDebugStringW(L"Settings saved to Homework.ini\n");
+                }
+                break;
             case 1:
                 MessageBoxW(
                     hWnd,
