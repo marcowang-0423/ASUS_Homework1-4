@@ -4,6 +4,8 @@
 #include "framework.h"
 #include "Homework.h"
 #include <strsafe.h>
+#include <TraceLoggingProvider.h>
+#pragma comment(lib, "advapi32.lib")
 
 #define MAX_LOADSTRING 100
 
@@ -64,6 +66,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     return (int) msg.wParam;
 }
+
+
+TRACELOGGING_DECLARE_PROVIDER(g_hProvider);
+
+TRACELOGGING_DEFINE_PROVIDER(
+    g_hProvider,
+    "HomeworkProvider",   // Provider 名字，自己取一個好記的
+    (0x23b2e3de, 0xe5bd, 0x4c1d, 0x99, 0xe0, 0x40, 0xdd, 0xb3, 0x20, 0x63, 0x4a)  // 換成你剛剛產生的 GUID
+);
+// 23b2e3de-e5bd-4c1d-99e0-40ddb320634a
+
 
 
 // 把最後一次的 API 錯誤碼轉成文字，輸出到 VS 主控台，並寫入 log 檔
@@ -217,6 +230,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //    LogLastError(L"CreateWindowW");
             //}
 
+            TraceLoggingRegister(g_hProvider);
+
 
 
             // "Simple >>" 標籤（先做成單純的靜態文字，不做展開/收合功能）
@@ -314,6 +329,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     WritePrivateProfileStringW(L"Color", L"Blue", blueText, L"C:\\ProgramData\\Homework.ini");
 
                     OutputDebugStringW(L"Settings saved to Homework.ini\n");
+
+                    TraceLoggingWrite(
+                        g_hProvider,
+                        "ApplyClicked",                                    // 事件名稱
+                        TraceLoggingWideString(redText, "Red"),
+                        TraceLoggingWideString(greenText, "Green"),
+                        TraceLoggingWideString(blueText, "Blue")
+                    );
                 }
                 break;
             case 1:
@@ -381,6 +404,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
+        TraceLoggingUnregister(g_hProvider);
         PostQuitMessage(0);
         break;
     default:
