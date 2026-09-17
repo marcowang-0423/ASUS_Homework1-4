@@ -3,16 +3,16 @@
 
 #include "framework.h"
 #include "Homework.h"
+#include "APPDef.h"
+#include "DebugLog.h"
+#include "IpcUtils.h"
+#include "ColorSettings.h"
 #include <strsafe.h>
 #include <TraceLoggingProvider.h>
 #pragma comment(lib, "advapi32.lib")
 
 #define MAX_LOADSTRING 100
 
-#define IDC_EDIT_RED    1001
-#define IDC_EDIT_GREEN  1002
-#define IDC_EDIT_BLUE   1003
-#define IDC_BUTTON_APPLY 1004
 
   
 
@@ -22,6 +22,9 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 標題列文字
 WCHAR szWindowClass[MAX_LOADSTRING];            // 主視窗類別名稱
 
 HWND hEditRed, hEditGreen, hEditBlue;           // 存輸入框的 handle
+HWND hEdit, hBtnSend, hBtnEvent;                // HW3 IPC
+
+
 
 // 這個程式碼模組所包含之函式的向前宣告:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -68,75 +71,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 }
 
 
+// TraceView
 TRACELOGGING_DECLARE_PROVIDER(g_hProvider);
 
 TRACELOGGING_DEFINE_PROVIDER(
     g_hProvider,
     "HomeworkProvider",   // Provider 名字，自己取一個好記的
     (0x23b2e3de, 0xe5bd, 0x4c1d, 0x99, 0xe0, 0x40, 0xdd, 0xb3, 0x20, 0x63, 0x4a)  // 換成你剛剛產生的 GUID
-);
-// 23b2e3de-e5bd-4c1d-99e0-40ddb320634a
+); // 23b2e3de-e5bd-4c1d-99e0-40ddb320634a
 
 
 
-// 把最後一次的 API 錯誤碼轉成文字，輸出到 VS 主控台，並寫入 log 檔
-void LogLastError(LPCWSTR functionName)
-{
-    DWORD errorCode = GetLastError();
-
-    // 用 FormatMessage 把數字錯誤碼轉成人看得懂的文字（作業 HINT 1, 2 就是在講這個）
-    LPWSTR messageBuffer = nullptr;
-    FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr,
-        errorCode,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPWSTR)&messageBuffer,
-        0,
-        nullptr
-    );
-
-    wchar_t logMsg[512];
-    StringCchPrintfW(logMsg, 512, L"[%s] failed. ErrorCode: %lu, Message: %s",
-        functionName, errorCode,
-        messageBuffer ? messageBuffer : L"Unknown error");
-
-    // ---- 需求 1: 輸出到 VS 主控台 ----
-    OutputDebugStringW(logMsg);
-    OutputDebugStringW(L"\n");
-
-    // ---- 進階需求: 寫入 log 檔 C:\ProgramData\Homework.log ----
-    HANDLE hFile = CreateFileW(
-        L"C:\\ProgramData\\Homework.log",
-        FILE_APPEND_DATA,
-        FILE_SHARE_READ,
-        nullptr,
-        OPEN_ALWAYS,          // 檔案不存在就建立，存在就從尾端接著寫
-        FILE_ATTRIBUTE_NORMAL,
-        nullptr
-    );
-
-    if (hFile != INVALID_HANDLE_VALUE)
-    {
-        char narrowBuf[512];
-        WideCharToMultiByte(CP_UTF8, 0, logMsg, -1, narrowBuf, 512, nullptr, nullptr);
-
-        DWORD written;
-        WriteFile(hFile, narrowBuf, (DWORD)strlen(narrowBuf), &written, nullptr);
-        WriteFile(hFile, "\r\n", 2, &written, nullptr);
-
-        CloseHandle(hFile);
-    }
-    else
-    {
-        OutputDebugStringW(L"寫入 log 檔失敗，可能是權限問題，試試看用系統管理員身分執行 VS\n");
-    }
-
-    if (messageBuffer)
-    {
-        LocalFree(messageBuffer);
-    }
-}
 
 
 
@@ -293,14 +238,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             );
 
             // 讀取 ini 檔，把上次存的值填回輸入框；如果 ini 檔不存在或沒有這個 key，就用預設值 "0x00"
-            wchar_t savedRed[16], savedGreen[16], savedBlue[16];
-            GetPrivateProfileStringW(L"Color", L"Red", L"0x00", savedRed, 16, L"C:\\ProgramData\\Homework.ini");
-            GetPrivateProfileStringW(L"Color", L"Green", L"0x00", savedGreen, 16, L"C:\\ProgramData\\Homework.ini");
-            GetPrivateProfileStringW(L"Color", L"Blue", L"0x00", savedBlue, 16, L"C:\\ProgramData\\Homework.ini");
+            LoadColorSettings();
 
-            SetWindowTextW(hEditRed, savedRed);
-            SetWindowTextW(hEditGreen, savedGreen);
-            SetWindowTextW(hEditBlue, savedBlue);
+            //HW3 IPC
+            hEdit = CreateWindowW(L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_BORDER,
+                20, 150, 200, 25, hWnd, (HMENU)ID_EDIT_TEXT, hInst, NULL);
+
+
+            hBtnSend = CreateWindowW(L"BUTTON", L"Send message", WS_CHILD | WS_VISIBLE,
+                20, 190, 150, 40, hWnd, (HMENU)ID_BTN_SEND, hInst, NULL);    
+
+            hBtnEvent = CreateWindowW(L"BUTTON", L"Raise event", WS_CHILD | WS_VISIBLE,
+                20, 250, 150, 40, hWnd, (HMENU)ID_BTN_EVENT, hInst, NULL);  
 
             
         }
@@ -311,32 +260,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 剖析功能表選取項目:
             switch (wmId)
             {
+
             case IDC_BUTTON_APPLY:
+                SaveColorSettings();
+                break;
+            case ID_BTN_SEND:
                 {
-                    wchar_t redText[16], greenText[16], blueText[16];
-                    GetWindowTextW(hEditRed, redText, 16);
-                    GetWindowTextW(hEditGreen, greenText, 16);
-                    GetWindowTextW(hEditBlue, blueText, 16);
+                    // 找對方視窗
+                    HWND hTarget = FindOtherHomeworkWindow(hWnd);
+                    if (hTarget)
+                    {
+                        // 把 Edit 欄位內容包成 COPYDATASTRUCT
+                        wchar_t buf[256];
+                        GetWindowTextW(hEdit, buf, 256);
 
-                    wchar_t debugMsg[128];
-                    StringCchPrintfW(debugMsg, 128, L"Apply clicked: R=%s, G=%s, B=%s\n",
-                    redText, greenText, blueText);
-                    OutputDebugStringW(debugMsg);
+                        COPYDATASTRUCT cds;
+                        cds.dwData = COPYDATA_TEXT_MSG;
+                        cds.cbData = (DWORD)((wcslen(buf) + 1) * sizeof(wchar_t));
+                        cds.lpData = buf;
 
-                    // 寫進 ini 檔，[Color] 區塊底下的 Red / Green / Blue
-                    WritePrivateProfileStringW(L"Color", L"Red", redText, L"C:\\ProgramData\\Homework.ini");
-                    WritePrivateProfileStringW(L"Color", L"Green", greenText, L"C:\\ProgramData\\Homework.ini");
-                    WritePrivateProfileStringW(L"Color", L"Blue", blueText, L"C:\\ProgramData\\Homework.ini");
-
-                    OutputDebugStringW(L"Settings saved to Homework.ini\n");
-
-                    TraceLoggingWrite(
-                        g_hProvider,
-                        "ApplyClicked",                                    // 事件名稱
-                        TraceLoggingWideString(redText, "Red"),
-                        TraceLoggingWideString(greenText, "Green"),
-                        TraceLoggingWideString(blueText, "Blue")
-                    );
+                        // 送出
+                        SendMessageW(hTarget, WM_COPYDATA, (WPARAM)hWnd, (LPARAM)&cds);
+                    }
+                    else
+                    {
+                        MessageBoxW(hWnd, L"找不到另一個執行中的 Homework", L"提示", MB_OK);
+                    }
                 }
                 break;
             case 1:
@@ -358,6 +307,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+    case WM_COPYDATA:
+        {
+            PCOPYDATASTRUCT pCDS = (PCOPYDATASTRUCT)lParam;
+            if (pCDS->dwData == COPYDATA_TEXT_MSG)
+            {
+                wchar_t* pText = (wchar_t*)pCDS->lpData;
+                MessageBoxW(hWnd, pText, L"收到訊息", MB_OK);
+            }
+            return TRUE;
+        }
     case WM_DRAWITEM:
     {
         LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;

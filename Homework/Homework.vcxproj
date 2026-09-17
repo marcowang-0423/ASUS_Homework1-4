@@ -123,13 +123,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="APPDef.h" />
+    <ClInclude Include="ColorSettings.h" />
+    <ClInclude Include="DebugLog.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Homework.h" />
+    <ClInclude Include="IpcUtils.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ColorSettings.cpp" />
+    <ClCompile Include="DebugLog.cpp" />
     <ClCompile Include="Homework.cpp" />
+    <ClCompile Include="IpcUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Homework.rc" />
