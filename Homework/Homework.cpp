@@ -76,7 +76,7 @@ TRACELOGGING_DECLARE_PROVIDER(g_hProvider);
 
 TRACELOGGING_DEFINE_PROVIDER(
     g_hProvider,
-    "HomeworkProvider",   // Provider 名字，自己取一個好記的
+    "HomeworkProvider",   // Provider 名字
     (0x23b2e3de, 0xe5bd, 0x4c1d, 0x99, 0xe0, 0x40, 0xdd, 0xb3, 0x20, 0x63, 0x4a)  // 換成你剛剛產生的 GUID
 ); // 23b2e3de-e5bd-4c1d-99e0-40ddb320634a
 
@@ -155,25 +155,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
         {
-            //HWND hButton = CreateWindowW(
-            //    L"BUTTON",              // 控制項類型
-            //    L"BUTTON",            // Button 上顯示的文字
-            //    WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,
-            //    100, 100,               // x, y
-            //    120, 40,                // width, height
-            //    hWnd,                   // parent window
-            //    (HMENU)1,               // Button ID
-            //    hInst,
-            //    nullptr
-            //);
+            HWND hButton = CreateWindowW(
+                L"BUTTON",              // 控制項類型
+                L"BUTTON",            // Button 上顯示的文字
+                WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,
+                20, 20,               // x, y
+                120, 40,                // width, height
+                hWnd,                   // parent window
+                (HMENU)1,               // Button ID
+                hInst,
+                nullptr
+            );
 
-            //// HW1 Debug message 
-            //HWND hFail = CreateWindowW(NULL, NULL, NULL, NULL, NULL,
-            //    NULL, NULL, NULL, NULL, NULL, NULL);
-            //if (hFail == NULL)
-            //{
-            //    LogLastError(L"CreateWindowW");
-            //}
+            // HW1 Debug message 
+            HWND hFail = CreateWindowW(NULL, NULL, NULL, NULL, NULL,
+                NULL, NULL, NULL, NULL, NULL, NULL);
+            if (hFail == NULL)
+            {
+                LogLastError(L"CreateWindowW");
+            }
 
             TraceLoggingRegister(g_hProvider);
 
@@ -183,7 +183,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             CreateWindowW(
                 L"STATIC", L"Simple >>",
                 WS_VISIBLE | WS_CHILD,
-                20, 20, 80, 20,
+                20, 70, 80, 20,
                 hWnd, nullptr, hInst, nullptr
             );
 
@@ -191,13 +191,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             CreateWindowW(
                 L"STATIC", L"Red",
                 WS_VISIBLE | WS_CHILD,
-                20, 60, 40, 20,
+                20, 110, 40, 20,
                 hWnd, nullptr, hInst, nullptr
             );
             hEditRed = CreateWindowW(
                 L"EDIT", L"0x00",
                 WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
-                70, 58, 60, 22,
+                70, 108, 60, 22,
                 hWnd, (HMENU)IDC_EDIT_RED, hInst, nullptr
             );
 
@@ -205,13 +205,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             CreateWindowW(
                 L"STATIC", L"Green",
                 WS_VISIBLE | WS_CHILD,
-                160, 60, 40, 20,
+                160, 110, 40, 20,
                 hWnd, nullptr, hInst, nullptr
             );
             hEditGreen = CreateWindowW(
                 L"EDIT", L"0x00",
                 WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
-                210, 58, 60, 22,
+                210, 108, 60, 22,
                 hWnd, (HMENU)IDC_EDIT_GREEN, hInst, nullptr
             );
 
@@ -219,13 +219,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             CreateWindowW(
                 L"STATIC", L"Blue",
                 WS_VISIBLE | WS_CHILD,
-                300, 60, 40, 20,
+                300, 110, 40, 20,
                 hWnd, nullptr, hInst, nullptr
             );
             hEditBlue = CreateWindowW(
                 L"EDIT", L"0x00",
                 WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT,
-                350, 58, 60, 22,
+                350, 108, 60, 22,
                 hWnd, (HMENU)IDC_EDIT_BLUE, hInst, nullptr
             );
 
@@ -233,7 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             CreateWindowW(
                 L"BUTTON", L"Apply",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                20, 100, 80, 30,
+                20, 150, 80, 30,
                 hWnd, (HMENU)IDC_BUTTON_APPLY, hInst, nullptr
             );
 
@@ -242,14 +242,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             //HW3 IPC
             hEdit = CreateWindowW(L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_BORDER,
-                20, 150, 200, 25, hWnd, (HMENU)ID_EDIT_TEXT, hInst, NULL);
+                20, 200, 200, 25, hWnd, (HMENU)ID_EDIT_TEXT, hInst, NULL);
 
 
             hBtnSend = CreateWindowW(L"BUTTON", L"Send message", WS_CHILD | WS_VISIBLE,
-                20, 190, 150, 40, hWnd, (HMENU)ID_BTN_SEND, hInst, NULL);    
+                20, 240, 150, 40, hWnd, (HMENU)ID_BTN_SEND, hInst, NULL);    
 
             hBtnEvent = CreateWindowW(L"BUTTON", L"Raise event", WS_CHILD | WS_VISIBLE,
-                20, 250, 150, 40, hWnd, (HMENU)ID_BTN_EVENT, hInst, NULL);  
+                20, 300, 150, 40, hWnd, (HMENU)ID_BTN_EVENT, hInst, NULL);  
 
             
         }
@@ -273,6 +273,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         // 把 Edit 欄位內容包成 COPYDATASTRUCT
                         wchar_t buf[256];
                         GetWindowTextW(hEdit, buf, 256);
+
+                        // Send struct
+                        //MyData data;
+                        //data.number = 42;          // demo 用的數字
+                        //wcscpy_s(data.text, buf);  // 把 Edit 欄位的文字塞進 struct
+                        //data.flag = true;          // demo 用的 bool
+
+                        //COPYDATASTRUCT cds;
+                        //cds.dwData = COPYDATA_STRUCT_MSG;   // 注意：識別碼換成 struct 那個
+                        //cds.cbData = sizeof(MyData);        // 大小直接用 sizeof，不用自己算 byte 數
+                        //cds.lpData = &data;
 
                         COPYDATASTRUCT cds;
                         cds.dwData = COPYDATA_TEXT_MSG;
@@ -314,6 +325,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 wchar_t* pText = (wchar_t*)pCDS->lpData;
                 MessageBoxW(hWnd, pText, L"收到訊息", MB_OK);
+            }
+            else if (pCDS->dwData == COPYDATA_STRUCT_MSG)
+            {
+                MyData* pData = (MyData*)pCDS->lpData;
+
+                wchar_t msg[256];
+                StringCchPrintfW(msg, 256, L"number = %d\ntext = %s\nflag = %s",
+                    pData->number, pData->text, pData->flag ? L"true" : L"false");
+
+                MessageBoxW(hWnd, msg, L"收到 struct", MB_OK);
             }
             return TRUE;
         }
