@@ -129,6 +129,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Homework.h" />
+    <ClInclude Include="IpcEvent.h" />
     <ClInclude Include="IpcUtils.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -137,6 +138,7 @@
     <ClCompile Include="ColorSettings.cpp" />
     <ClCompile Include="DebugLog.cpp" />
     <ClCompile Include="Homework.cpp" />
+    <ClCompile Include="IpcEvent.cpp" />
     <ClCompile Include="IpcUtils.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -10,3 +10,7 @@ extern WCHAR szWindowClass[];
 // HW2
 extern HWND hEditRed, hEditGreen, hEditBlue;
 TRACELOGGING_DECLARE_PROVIDER(g_hProvider);
+
+// HW3 Event
+extern HANDLE hEvent;
+extern WCHAR  g_myEventName[64];

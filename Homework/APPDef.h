@@ -21,6 +21,13 @@
 #define COPYDATA_TEXT_MSG    1   // 純文字訊息（HW3 基本題）
 #define COPYDATA_STRUCT_MSG  2   // struct 訊息（HW3 進階題，int/WCHAR/bool）
 
+
+// =====================================================
+// HW3 Event
+// =====================================================
+#define HOMEWORK_EVENT_NAME_FMT L"HomeworkSyncEvent_%lu"	// Process ID
+#define WM_APP_EVENT_TRIGGERED  (WM_APP + 1)               // 通知「我方 UI」要重新讀 ini 的自訂訊息
+
 // =====================================================
 // 共用檔案路徑
 // =====================================================

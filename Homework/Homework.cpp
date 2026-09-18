@@ -5,8 +5,9 @@
 #include "Homework.h"
 #include "APPDef.h"
 #include "DebugLog.h"
-#include "IpcUtils.h"
 #include "ColorSettings.h"
+#include "IpcUtils.h"
+#include "IpcEvent.h"
 #include <strsafe.h>
 #include <TraceLoggingProvider.h>
 #pragma comment(lib, "advapi32.lib")
@@ -23,6 +24,9 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 主視窗類別名稱
 
 HWND hEditRed, hEditGreen, hEditBlue;           // 存輸入框的 handle
 HWND hEdit, hBtnSend, hBtnEvent;                // HW3 IPC
+
+HANDLE hEvent = NULL;       // Processevent handle
+WCHAR  g_myEventName[64];   // Event name
 
 
 
@@ -167,15 +171,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 nullptr
             );
 
-            // HW1 Debug message 
-            HWND hFail = CreateWindowW(NULL, NULL, NULL, NULL, NULL,
-                NULL, NULL, NULL, NULL, NULL, NULL);
-            if (hFail == NULL)
-            {
-                LogLastError(L"CreateWindowW");
-            }
+            //// HW1 Debug message 
+            //HWND hFail = CreateWindowW(NULL, NULL, NULL, NULL, NULL,
+            //    NULL, NULL, NULL, NULL, NULL, NULL);
+            //if (hFail == NULL)
+            //{
+            //    LogLastError(L"CreateWindowW");
+            //}
 
-            TraceLoggingRegister(g_hProvider);
+            //TraceLoggingRegister(g_hProvider);
 
 
 
@@ -233,23 +237,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             CreateWindowW(
                 L"BUTTON", L"Apply",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                20, 150, 80, 30,
+                20, 150, 80, 40,
                 hWnd, (HMENU)IDC_BUTTON_APPLY, hInst, nullptr
             );
 
             // 讀取 ini 檔，把上次存的值填回輸入框；如果 ini 檔不存在或沒有這個 key，就用預設值 "0x00"
             LoadColorSettings();
 
-            //HW3 IPC
+            //HW3 IPC send message
             hEdit = CreateWindowW(L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_BORDER,
-                20, 200, 200, 25, hWnd, (HMENU)ID_EDIT_TEXT, hInst, NULL);
+                20, 250, 200, 25, hWnd, (HMENU)ID_EDIT_TEXT, hInst, NULL);
 
 
             hBtnSend = CreateWindowW(L"BUTTON", L"Send message", WS_CHILD | WS_VISIBLE,
-                20, 240, 150, 40, hWnd, (HMENU)ID_BTN_SEND, hInst, NULL);    
+                20, 290, 150, 40, hWnd, (HMENU)ID_BTN_SEND, hInst, NULL);    
 
             hBtnEvent = CreateWindowW(L"BUTTON", L"Raise event", WS_CHILD | WS_VISIBLE,
-                20, 300, 150, 40, hWnd, (HMENU)ID_BTN_EVENT, hInst, NULL);  
+                130, 150, 150, 40, hWnd, (HMENU)ID_BTN_EVENT, hInst, NULL);  
+
+
+            //HW3 Raise event
+
+            DWORD myPid = GetCurrentProcessId();
+            StringCchPrintfW(g_myEventName, 64, HOMEWORK_EVENT_NAME_FMT, myPid);
+
+            hEvent = CreateEventW(
+                NULL,             // 預設安全性，不給子行程繼承
+                FALSE,            // auto-reset
+                FALSE,            // 初始狀態：non-signaled（還沒人觸發過）
+                g_myEventName );  // 自己專屬的名字，例如 "HomeworkSyncEvent_12345"
+
+            if (hEvent == NULL)
+            {
+                LogLastError(L"CreateEventW");
+            }
+
+            CreateThread(NULL, 0, WaitEventThread, hWnd, 0, NULL);
 
             
         }
@@ -299,6 +322,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     }
                 }
                 break;
+            case ID_BTN_EVENT:
+                {
+                    HWND hTarget = FindOtherHomeworkWindow(hWnd);
+                    if (hTarget)
+                    {
+                        SaveColorSettings();       // 1. 先把目前設定寫進 ini
+                        RaiseOtherEvent(hTarget);  // 2. 再通知對方「可以來讀了」
+                    }
+                    else
+                    {
+                        MessageBoxW(hWnd, L"找不到另一個執行中的 Homework", L"提示", MB_OK);
+                    }
+                }
+                break;
             case 1:
                 MessageBoxW(
                     hWnd,
@@ -338,6 +375,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             return TRUE;
         }
+    case WM_APP_EVENT_TRIGGERED:
+        LoadColorSettings();
+        break;
     case WM_DRAWITEM:
     {
         LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
@@ -386,6 +426,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         TraceLoggingUnregister(g_hProvider);
         PostQuitMessage(0);
+        CloseHandle(hEvent);
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
