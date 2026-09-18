@@ -131,6 +131,7 @@
     <ClInclude Include="Homework.h" />
     <ClInclude Include="IpcEvent.h" />
     <ClInclude Include="IpcUtils.h" />
+    <ClInclude Include="RegistryUtils.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -140,6 +141,7 @@
     <ClCompile Include="Homework.cpp" />
     <ClCompile Include="IpcEvent.cpp" />
     <ClCompile Include="IpcUtils.cpp" />
+    <ClCompile Include="RegistryUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Homework.rc" />

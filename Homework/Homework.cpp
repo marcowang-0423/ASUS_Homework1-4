@@ -8,6 +8,7 @@
 #include "ColorSettings.h"
 #include "IpcUtils.h"
 #include "IpcEvent.h"
+#include "RegistryUtils.h"
 #include <strsafe.h>
 #include <TraceLoggingProvider.h>
 #pragma comment(lib, "advapi32.lib")
@@ -273,6 +274,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
 
             CreateThread(NULL, 0, WaitEventThread, hWnd, 0, NULL);
+
+            //// HW4 Registry
+            //WriteHomeworkValue(hWnd);
+            //ReadOOBEStatus(hWnd);
 
             
         }
