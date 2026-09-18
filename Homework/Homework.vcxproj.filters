@@ -45,6 +45,12 @@
     <ClInclude Include="IpcEvent.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="RegistryUtils.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="WmiUtils.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Homework.cpp">
@@ -60,6 +66,12 @@
       <Filter>來源檔案</Filter>
     </ClCompile>
     <ClCompile Include="IpcEvent.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryUtils.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="WmiUtils.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
   </ItemGroup>

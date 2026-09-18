@@ -9,6 +9,7 @@
 #include "IpcUtils.h"
 #include "IpcEvent.h"
 #include "RegistryUtils.h"
+#include "WmiUtils.h"
 #include <strsafe.h>
 #include <TraceLoggingProvider.h>
 #pragma comment(lib, "advapi32.lib")
@@ -278,6 +279,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //// HW4 Registry
             //WriteHomeworkValue(hWnd);
             //ReadOOBEStatus(hWnd);
+
+            //// HW4 WMI：讀取 BIOS 資訊與 ATK 驅動版本
+            //ReadBiosInfo(hWnd);
+            //ReadAtkDriverVersion(hWnd);
 
             
         }

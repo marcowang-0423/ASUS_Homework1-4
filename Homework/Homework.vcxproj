@@ -134,6 +134,7 @@
     <ClInclude Include="RegistryUtils.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="WmiUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ColorSettings.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="IpcEvent.cpp" />
     <ClCompile Include="IpcUtils.cpp" />
     <ClCompile Include="RegistryUtils.cpp" />
+    <ClCompile Include="WmiUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Homework.rc" />
