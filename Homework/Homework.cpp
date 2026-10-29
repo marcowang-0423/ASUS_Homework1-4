@@ -286,7 +286,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //ReadAtkDriverVersion(hWnd);
 
             //// HW4 Register the task
-            /*RegisterLogonTask(hWnd);*/
+            RegisterLogonTask(hWnd);
 
             
         }
