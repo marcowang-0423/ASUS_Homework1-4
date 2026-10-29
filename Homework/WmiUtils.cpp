@@ -92,7 +92,7 @@ void ReadBiosInfo(HWND hWnd)
         return;
     }
 
-    // 7. 取出第一筆（也是唯一一筆）結果
+    // 7. 取出結果
     IWbemClassObject* pClassObj = NULL;
     ULONG uReturn = 0;
     wchar_t msg[256] = L"";
