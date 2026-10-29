@@ -11,3 +11,6 @@ Release/
 *.tlog
 *.log
 *.aps
+
+# Security knowledge base (local snapshot, see .github/security-kb.json)
+/.kb/

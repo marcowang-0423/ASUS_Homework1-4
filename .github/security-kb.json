@@ -1,0 +1,8 @@
+{
+  "_about": "Security knowledge base used by the reviewers (Claude /code-review, Copilot Reviewer, ReviewerCodex). Read by .github/scripts/Find-SecurityKbHits.ps1. localPath is relative to the repo root; override per machine with env GLIDEX_SECKB_PATH. Set repo (and branch) to enable -Update (git clone / pull --ff-only).",
+  "localPath": ".kb",
+  "corpora": ["entries"],
+  "statuses": ["active"],
+  "repo": "",
+  "branch": "main"
+}
