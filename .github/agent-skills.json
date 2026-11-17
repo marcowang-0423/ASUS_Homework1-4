@@ -1,0 +1,8 @@
+{
+  "_about": "Shared agent skills this project uses (Agent/Skills catalog ids; dependsOn are added automatically). The skill files are not committed: install them once per clone with powershell -NoProfile -ExecutionPolicy Bypass -File \"$env:USERPROFILE\\.agent-skills\\repo\\agent-skills.ps1\" init -Project . (first time on this machine: git clone https://APZABS5ASC.corpnet.asus:8010/Agent/Skills \"$env:USERPROFILE\\.agent-skills\\repo\"). Change the list with agent-skills.ps1 add / remove, or edit \"skills\" and commit.",
+  "schemaVersion": 1,
+  "skills": [
+    "code-review",
+    "planner-executor"
+  ]
+}
